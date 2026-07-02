@@ -672,13 +672,22 @@
     adminModalOverlay.classList.remove('show');
   }
 
-  function handleAdminModalSubmit (e) {
+  async function handleAdminModalSubmit (e) {
     e.preventDefault();
     adminModalError.classList.add('hidden');
     if (adminModalPw.value === 'Admin@101') {
       setAdmin(true);
       closeAdminModal();
       updateAdminStatus();
+      var remote = await adminApiGet();
+      if (remote) {
+        applyParsedState(remote);
+        saveState();
+        if (state.onboarding) {
+          onboardingOverlay.classList.add('hidden');
+          initDashboard();
+        }
+      }
     } else {
       adminModalError.textContent = 'Invalid code.';
       adminModalError.classList.remove('hidden');
