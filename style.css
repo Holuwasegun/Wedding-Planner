@@ -946,6 +946,40 @@ a { color: var(--primary); text-decoration: none; }
   .chat-toggle svg { width: 20px; height: 20px; }
 }
 
+/* ───────────────── Admin Login ────────────────── */
+.admin-link {
+  position: fixed; bottom: 0.75rem; right: 0.75rem;
+  z-index: 999;
+  font-size: 0.65rem; color: rgba(0,0,0,0.2);
+  cursor: pointer; user-select: none;
+  transition: color 0.2s;
+  font-family: var(--font-body);
+}
+.admin-link:hover { color: var(--primary); }
+.admin-link.logged-in { color: var(--primary); }
+.admin-login-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 3000;
+  background: var(--obsidian);
+  align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+.admin-login-overlay.show { display: flex; }
+.admin-login-overlay .modal-content {
+  background: var(--white); border-radius: var(--radius);
+  width: 100%; max-width: 400px;
+  padding: 2rem 1.5rem;
+}
+.admin-error {
+  background: #FEE2E2;
+  color: var(--danger);
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  border: 1px solid #FECACA;
+}
+
 /* ───────────────── Scrollbar ───────────────── */
 .budget-ledger::-webkit-scrollbar, .chat-messages::-webkit-scrollbar { width: 4px; }
 .budget-ledger::-webkit-scrollbar-track, .chat-messages::-webkit-scrollbar-track { background: transparent; }

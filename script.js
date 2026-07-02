@@ -122,6 +122,14 @@
   const logoutCancel = $('#logout-cancel');
   const logoutConfirm = $('#logout-confirm');
 
+  const adminLink = $('#admin-link');
+  const adminOverlay = $('#admin-login-overlay');
+  const adminClose = $('#admin-login-close');
+  const adminForm = $('#admin-login-form');
+  const adminEmail = $('#admin-email');
+  const adminPassword = $('#admin-password');
+  const adminError = $('#admin-error');
+
   // ─── Client ID ────────────────────────────────────
   function getOrCreateClientId () {
     let id = localStorage.getItem('codeshakers_client_id');
@@ -631,8 +639,51 @@
     return div.innerHTML;
   }
 
+  // ─── Admin Login ────────────────────────────────
+  function isAdmin () {
+    return localStorage.getItem('codeshakers_admin') === 'true';
+  }
+
+  function setAdmin (val) {
+    if (val) localStorage.setItem('codeshakers_admin', 'true');
+    else localStorage.removeItem('codeshakers_admin');
+    adminLink.classList.toggle('logged-in', !!val);
+  }
+
+  function openAdmin () {
+    hideAdminError();
+    adminEmail.value = '';
+    adminPassword.value = '';
+    adminOverlay.classList.add('show');
+    setTimeout(function () { adminEmail.focus(); }, 100);
+  }
+
+  function closeAdmin () {
+    adminOverlay.classList.remove('show');
+  }
+
+  function hideAdminError () {
+    adminError.classList.add('hidden');
+    adminError.textContent = '';
+  }
+
+  function handleAdminLogin (e) {
+    e.preventDefault();
+    hideAdminError();
+    var email = adminEmail.value.trim();
+    var password = adminPassword.value;
+    if (email === 'Admin@101' && password === 'Admin@101') {
+      setAdmin(true);
+      closeAdmin();
+    } else {
+      adminError.textContent = 'Invalid email or password.';
+      adminError.classList.remove('hidden');
+    }
+  }
+
   // ─── Bootstrap ─────────────────────────────────────
   function boot () {
+    if (isAdmin()) adminLink.classList.add('logged-in');
     clientId = getOrCreateClientId();
     var loaded = loadState();
     if (loaded && state.onboarding) {
@@ -670,6 +721,11 @@
     if (e.target === logoutOverlay) closeLogout();
   });
   logoutConfirm.addEventListener('click', handleLogout);
+
+  adminLink.addEventListener('click', openAdmin);
+  adminClose.addEventListener('click', closeAdmin);
+  adminForm.addEventListener('submit', handleAdminLogin);
+  adminOverlay.addEventListener('click', function (e) { if (e.target === adminOverlay) closeAdmin(); });
 
   boot();
 
