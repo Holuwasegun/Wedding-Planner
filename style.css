@@ -1052,5 +1052,4 @@ a { color: var(--primary); text-decoration: none; }
 .budget-ledger::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 .budget-ledger::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:hover { background: var(--light-slate); }
 
-.brand-logo { max-height: 48px; width: auto; object-fit: contain; }
 
