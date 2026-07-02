@@ -219,7 +219,7 @@
     updateSummaryCards();
 
     if (chatMessages.children.length === 0) {
-      appendChatMessage('Welcome to codeshakers. I\'m ZenAI, your mindful wedding planning assistant. Ask me anything about your wedding — I\'m here to help with clarity and calm.', 'bot');
+      appendChatMessage('Welcome to codeshakers. I\'m ZenAI, your wedding planning assistant. Ask me anything — venues, budgeting, decor, timelines, attire, traditions, or whatever you need for your big day.', 'bot');
     }
   }
 
