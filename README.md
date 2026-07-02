@@ -1,18 +1,19 @@
 # codeshakers — Wedding Planner
 
-A branded digital wedding planning app with a persistent database, sidebar navigation, mobile responsiveness, and Gemini AI integration.
+A branded digital wedding planning app with Supabase persistence (admin only), Gemini AI (ZenAI), sidebar navigation, and mobile responsiveness.
 
 ## Features
 
 - **Onboarding wizard** — Enter couple names, wedding date, and budget to get started
 - **Dashboard** — Countdown timer, summary cards (days left, tasks done, budget remaining, expenses)
-- **Milestones checklist** — 4 phases (6+ months, 3 months, 1 month, wedding week) with collapsible sections, add/delete/check off tasks
-- **Budget ledger** — Track expenses with NGN formatting, see spent/remaining at a glance
-- **ZenAI chat** — Real Gemini 2.0 Flash AI consultant with full wedding context (couple names, date, budget, task progress)
+- **Milestones checklist** — 4 phases with collapsible sections, add/delete/check off tasks
+- **Budget ledger** — Track expenses in NGN, see spent/remaining at a glance
+- **ZenAI chat** — Real Gemini 2.0 Flash AI consultant with full wedding context
 - **Settings modal** — Edit wedding details anytime
-- **Persistent storage** — localStorage + Supabase PostgreSQL via Vercel serverless API
-- **Mobile responsive** — Collapsible sidebar, stacked grids, touch-friendly targets (44px min-height)
-- **Logout** — Session reset with data preserved
+- **Admin account** — Click "Admin" below Begin Planning → enter code `Admin@101` → data syncs to Supabase cloud
+- **Non-admin users** — No login needed, data stored in localStorage only (per-browser)
+- **Mobile responsive** — Collapsible sidebar, stacked grids, touch-friendly targets
+- **Start Over** — Clear all data and begin fresh
 
 ## Tech Stack
 
@@ -20,7 +21,7 @@ A branded digital wedding planning app with a persistent database, sidebar navig
 |-------|-----------|
 | Frontend | Vanilla JS, CSS (no framework) |
 | Styling | CSS custom properties (design tokens), DM Sans / Playfair Display fonts |
-| Database | Supabase (PostgreSQL) |
+| Database | Supabase (PostgreSQL) — admin only |
 | Serverless API | Vercel Node.js functions (`/api/*`) |
 | AI | Google Gemini 2.0 Flash |
 | Deployment | Vercel |
@@ -31,7 +32,7 @@ A branded digital wedding planning app with a persistent database, sidebar navig
 .
 ├── index.html            # Main HTML — onboarding, sidebar, dashboard, modals, chat
 ├── style.css             # Full design system + responsive breakpoints
-├── script.js             # App logic — state, checklist, budget, chat, persistence
+├── script.js             # App logic — state, checklist, budget, chat, admin auth, persistence
 ├── api/
 │   ├── data.js           # CRUD serverless function (Supabase wedding_plans table)
 │   └── chat.js           # Gemini AI proxy serverless function
@@ -78,7 +79,7 @@ This is a static HTML/CSS/JS app — no build step required. Serve it locally:
 npx serve .
 ```
 
-Or open `index.html` directly in a browser (API calls will fail without the serverless functions — localStorage still works).
+Or open `index.html` directly in a browser (API calls will fail without the serverless functions — localStorage still works for all users).
 
 ### 4. Deploy to Vercel
 
@@ -87,11 +88,23 @@ npm i -g vercel
 vercel --prod
 ```
 
-Set the environment variables in the Vercel dashboard (or use `vercel env add`):
+Set the environment variables in the Vercel dashboard:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `GEMINI_API_KEY`
+
+## Usage
+
+### Regular Users
+Open the app → fill in the onboarding form → start planning. All data stays in your browser's localStorage.
+
+### Admin (Cloud Sync)
+1. Fill in the onboarding form or load your existing data
+2. Click **"Admin"** below the Begin Planning button
+3. Enter the admin code: `Admin@101`
+4. Once authenticated, a green ✓ appears — your data now syncs to Supabase automatically
+5. Log in on any device and your data will load from the cloud
 
 ## API Endpoints
 
@@ -137,7 +150,7 @@ CREATE TABLE wedding_plans (
 );
 ```
 
-Row Level Security is enabled with an anonymous access policy for simplicity.
+Row Level Security is enabled with an anonymous access policy.
 
 ## Design Tokens
 
