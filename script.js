@@ -145,6 +145,7 @@
     try {
       localStorage.setItem('codeshakers_state', JSON.stringify(state));
     } catch (e) { }
+    if (isAdmin()) adminApiPut(state);
   }
 
   function loadState () {
@@ -681,10 +682,42 @@
     }
   }
 
+  // ─── Admin Supabase Sync ─────────────────────────
+  const ADMIN_CLIENT_ID = 'admin-main-account';
+  const API_BASE = '/api';
+
+  async function adminApiGet () {
+    try {
+      var res = await fetch(API_BASE + '/data?client_id=' + ADMIN_CLIENT_ID);
+      var json = await res.json();
+      return json.data;
+    } catch (e) { return null; }
+  }
+
+  async function adminApiPut (weddingData) {
+    try {
+      await fetch(API_BASE + '/data?client_id=' + ADMIN_CLIENT_ID, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wedding_data: weddingData })
+      });
+    } catch (e) {}
+  }
+
   // ─── Bootstrap ─────────────────────────────────────
-  function boot () {
+  async function boot () {
     if (isAdmin()) adminLink.classList.add('logged-in');
     clientId = getOrCreateClientId();
+
+    if (isAdmin()) {
+      var remote = await adminApiGet();
+      if (remote) {
+        applyParsedState(remote);
+        saveState();
+        if (state.onboarding) { initDashboard(); return; }
+      }
+    }
+
     var loaded = loadState();
     if (loaded && state.onboarding) {
       initDashboard();
