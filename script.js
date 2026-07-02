@@ -103,6 +103,8 @@
   const settingsP1 = $('#settings-p1');
   const settingsP2 = $('#settings-p2');
   const settingsDate = $('#settings-date');
+  const settingsGuests = $('#settings-guests');
+  const settingsVenue = $('#settings-venue');
   const settingsBudget = $('#settings-budget');
 
   const cardDays = $('#card-days');
@@ -115,6 +117,12 @@
   const sidebarToggle = $('#sidebar-toggle');
   const mobileMenuBtn = $('#mobile-menu-btn');
   const sidebarLinks = $$('.sidebar-link');
+
+  const btnLogout = $('#btn-logout');
+  const logoutOverlay = $('#logout-overlay');
+  const logoutClose = $('#logout-close');
+  const logoutCancel = $('#logout-cancel');
+  const logoutConfirm = $('#logout-confirm');
 
   // ─── Client ID ────────────────────────────────────
   function getOrCreateClientId () {
@@ -168,11 +176,13 @@
     const partner1 = $('#partner1').value.trim();
     const partner2 = $('#partner2').value.trim();
     const weddingDate = $('#wedding-date').value;
+    const guests = parseInt($('#guests').value) || 0;
+    const venue = $('#venue').value.trim();
     const budget = parseFloat($('#budget').value);
 
     if (!partner1 || !partner2 || !weddingDate || !budget) return;
 
-    state.onboarding = { partner1, partner2, weddingDate, budget };
+    state.onboarding = { partner1, partner2, weddingDate, budget, guests, venue };
     state.checklist = CHECKLIST_TASKS.map(phase => ({
       title: phase.title,
       tasks: phase.tasks.map(t => ({ text: t, done: false }))
@@ -536,6 +546,8 @@
     settingsP1.value = o.partner1;
     settingsP2.value = o.partner2;
     settingsDate.value = o.weddingDate;
+    settingsGuests.value = o.guests || '';
+    settingsVenue.value = o.venue || '';
     settingsBudget.value = o.budget;
     settingsOverlay.classList.add('show');
   }
@@ -549,13 +561,42 @@
     const partner1 = settingsP1.value.trim();
     const partner2 = settingsP2.value.trim();
     const weddingDate = settingsDate.value;
+    const guests = parseInt(settingsGuests.value) || 0;
+    const venue = settingsVenue.value.trim();
     const budget = parseFloat(settingsBudget.value);
     if (!partner1 || !partner2 || !weddingDate || !budget) return;
 
-    state.onboarding = { partner1, partner2, weddingDate, budget };
+    state.onboarding = { partner1, partner2, weddingDate, budget, guests, venue };
     saveState();
     closeSettings();
     initDashboard();
+  }
+
+  // ─── Logout / Start Over ──────────────────────────
+  function openLogout () {
+    logoutOverlay.classList.add('show');
+  }
+
+  function closeLogout () {
+    logoutOverlay.classList.remove('show');
+  }
+
+  function handleLogout () {
+    closeLogout();
+    state = { onboarding: null, checklist: [], budget: [] };
+    collapsedPhases = new Set();
+    if (countdownInterval) clearInterval(countdownInterval);
+    localStorage.removeItem('codeshakers_state');
+    dashboard.classList.add('hidden');
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('wedding-date').setAttribute('min', today);
+    document.getElementById('wedding-date').value = '';
+    $('#partner1').value = '';
+    $('#partner2').value = '';
+    $('#guests').value = '';
+    $('#venue').value = '';
+    $('#budget').value = '';
+    onboardingOverlay.classList.remove('hidden');
   }
 
   // ─── Summary Cards ───────────────────────────────
@@ -631,6 +672,14 @@
     if (e.target === settingsOverlay) closeSettings();
   });
   settingsForm.addEventListener('submit', handleSettingsSave);
+
+  btnLogout.addEventListener('click', openLogout);
+  logoutClose.addEventListener('click', closeLogout);
+  logoutCancel.addEventListener('click', closeLogout);
+  logoutOverlay.addEventListener('click', (e) => {
+    if (e.target === logoutOverlay) closeLogout();
+  });
+  logoutConfirm.addEventListener('click', handleLogout);
 
   boot();
 

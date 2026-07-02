@@ -39,6 +39,16 @@
           <label for="wedding-date">Wedding Date</label>
           <input type="date" id="wedding-date" name="wedding-date" required>
         </div>
+        <div class="form-row two-col">
+          <div class="field">
+            <label for="guests">Guest Count</label>
+            <input type="number" id="guests" name="guests" placeholder="100" min="1" required>
+          </div>
+          <div class="field">
+            <label for="venue">Venue / Location</label>
+            <input type="text" id="venue" name="venue" placeholder="e.g. The Grand Hall, Lagos" required>
+          </div>
+        </div>
         <div class="field">
           <label for="budget">Total Budget (NGN)</label>
           <input type="number" id="budget" name="budget" placeholder="500000" min="1" required>
@@ -94,6 +104,14 @@
               d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
           <span>Settings</span>
+        </button>
+        <button class="sidebar-link sidebar-btn sidebar-logout" id="btn-logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Start Over</span>
         </button>
 
       </div>
@@ -270,6 +288,21 @@
   <!-- Sidebar overlay (mobile) -->
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
+  <!-- ═══════════════════ LOGOUT CONFIRMATION ═══════════════════ -->
+  <div class="modal-overlay" id="logout-overlay">
+    <div class="modal-content modal-confirm">
+      <div class="modal-header">
+        <h2>Start Over</h2>
+        <button class="modal-close" id="logout-close" aria-label="Close">&times;</button>
+      </div>
+      <p class="confirm-text">This will clear all your wedding data and start fresh. Your current data will be lost.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="logout-cancel">Cancel</button>
+        <button type="button" class="btn-primary btn-danger" id="logout-confirm">Start Over</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══════════════════ SETTINGS MODAL ═══════════════════ -->
   <div class="modal-overlay" id="settings-overlay">
     <div class="modal-content">
@@ -291,6 +324,16 @@
         <div class="field">
           <label for="settings-date">Wedding Date</label>
           <input type="date" id="settings-date" required>
+        </div>
+        <div class="form-row two-col">
+          <div class="field">
+            <label for="settings-guests">Guest Count</label>
+            <input type="number" id="settings-guests" min="1" required>
+          </div>
+          <div class="field">
+            <label for="settings-venue">Venue / Location</label>
+            <input type="text" id="settings-venue" required>
+          </div>
         </div>
         <div class="field">
           <label for="settings-budget">Total Budget (NGN)</label>
