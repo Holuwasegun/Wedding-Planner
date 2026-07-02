@@ -50,8 +50,56 @@
   --shadow-lg: 4px 6px 8px rgba(0,0,0,0.32);
   --shadow-soft: 2px 2px 20px rgba(0,0,0,0.12);
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-label: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Typography scale (from design tokens) */
+  --display-large: 4rem;         /* 64px */
+  --display-large-lh: 1.5;
+  --display-large-ls: -2.56px;
+  --display-medium: 3.125rem;    /* 50px */
+  --display-medium-lh: 1.5;
+  --display-medium-ls: -3px;
+  --display-small: 2.5rem;       /* 40px */
+  --display-small-lh: 1.5;
+  --display-small-ls: -0.92px;
+  --headline-large: 2rem;        /* 32px */
+  --headline-large-lh: 1.5;
+  --headline-large-ls: -0.5px;
+  --headline-medium: 1.75rem;    /* 28px */
+  --headline-medium-lh: 1.5;
+  --headline-medium-ls: -0.28px;
+  --headline-small: 1.5rem;      /* 24px */
+  --headline-small-lh: 1.5;
+  --headline-small-ls: -0.24px;
+  --title-large: 1.375rem;       /* 22px */
+  --title-large-lh: 1.5;
+  --title-large-ls: -0.22px;
+  --title-medium: 1rem;          /* 16px */
+  --title-medium-lh: 1.5;
+  --title-medium-ls: -0.136px;
+  --title-small: 0.875rem;       /* 14px */
+  --title-small-lh: 1.5;
+  --title-small-ls: -0.105px;
+  --body-large: 1rem;            /* 16px */
+  --body-large-lh: 1.5;
+  --body-large-ls: -0.128px;
+  --body-medium: 0.875rem;       /* 14px */
+  --body-medium-lh: 1.5;
+  --body-medium-ls: 0px;
+  --body-small: 0.75rem;         /* 12px */
+  --body-small-lh: 1.5;
+  --body-small-ls: 0.09px;
+  --label-large: 0.875rem;       /* 14px */
+  --label-large-lh: 1.5;
+  --label-large-ls: -0.126px;
+  --label-medium: 0.75rem;       /* 12px */
+  --label-medium-lh: 1.5;
+  --label-medium-ls: 0.108px;
+  --label-small: 0.688rem;       /* 11px */
+  --label-small-lh: 1.5;
+  --label-small-ls: 0.088px;
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar-width: 240px;
   --sidebar-collapsed: 64px;
@@ -60,18 +108,20 @@
 html { font-size: 16px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
+  font-size: var(--body-medium);
+  line-height: var(--body-medium-lh);
+  letter-spacing: var(--body-medium-ls);
   background: var(--white);
   color: var(--charcoal);
-  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5 { font-family: var(--font-heading); font-weight: 600; line-height: 1.3; }
-h1 { font-size: 2.5rem; letter-spacing: -0.02em; }
-h2 { font-size: 1.75rem; letter-spacing: -0.01em; }
-h3 { font-size: 1.25rem; }
+h1, h2, h3, h4, h5 { font-family: var(--font-heading); font-weight: 500; line-height: 1.3; }
+h1 { font-size: var(--headline-large); letter-spacing: var(--headline-large-ls); font-weight: 500; }
+h2 { font-size: var(--headline-medium); letter-spacing: var(--headline-medium-ls); font-weight: 500; }
+h3 { font-size: var(--headline-small); letter-spacing: var(--headline-small-ls); font-weight: 500; }
 input, button, select, textarea { font-family: var(--font-body); }
 button { cursor: pointer; }
 a { color: var(--primary); text-decoration: none; }
@@ -319,11 +369,11 @@ a { color: var(--primary); text-decoration: none; }
   flex-wrap: wrap; gap: 1.5rem;
 }
 .couple-info h1 {
-  font-size: 2rem; margin: 0; color: var(--charcoal);
+  font-size: var(--headline-large); margin: 0; color: var(--charcoal); font-weight: 500;
 }
 .couple-info .wedding-date-label {
-  color: var(--slate);
-  font-size: 0.875rem; margin-top: 0.25rem;
+  font-size: var(--body-small);
+  color: var(--slate); margin-top: 0.25rem;
   letter-spacing: 0.02em;
 }
 .couple-info .wedding-date-label strong {
@@ -339,12 +389,12 @@ a { color: var(--primary); text-decoration: none; }
 .countdown-unit { text-align: center; min-width: 60px; }
 .countdown-unit .num {
   font-family: var(--font-heading);
-  font-size: 2rem; font-weight: 700;
+  font-size: var(--display-small); font-weight: 500;
   color: var(--primary);
   line-height: 1; display: block;
 }
 .countdown-unit .label {
-  font-size: 0.7rem; text-transform: uppercase;
+  font-size: var(--label-medium); text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--slate);
   margin-top: 0.25rem; display: block;
 }
@@ -382,11 +432,11 @@ a { color: var(--primary); text-decoration: none; }
 .card-data { display: flex; flex-direction: column; }
 .card-value {
   font-family: var(--font-heading);
-  font-size: 1.35rem; font-weight: 700;
+  font-size: var(--title-large); font-weight: 500;
   color: var(--charcoal); line-height: 1.2;
 }
 .card-label {
-  font-size: 0.75rem; font-weight: 500;
+  font-size: var(--label-small); font-weight: 500;
   color: var(--slate); margin-top: 0.1rem;
 }
 
@@ -898,10 +948,10 @@ a { color: var(--primary); text-decoration: none; }
 }
 
 @media (max-width: 768px) {
-  h1 { font-size: 1.75rem; }
-  h2 { font-size: 1.35rem; }
+  h1 { font-size: var(--headline-medium); }
+  h2 { font-size: var(--title-large); }
   .dashboard-header { padding: 1.25rem 1rem; }
-  .couple-info h1 { font-size: 1.5rem; }
+  .couple-info h1 { font-size: var(--headline-small); }
   .countdown-block { width: 100%; justify-content: center; padding: 0.75rem 1rem; background: var(--white); border: 1px solid var(--border); box-shadow: var(--shadow-soft); }
   .countdown-unit { min-width: 50px; }
   .countdown-unit .num { font-size: 1.3rem; }
@@ -1000,3 +1050,6 @@ a { color: var(--primary); text-decoration: none; }
 .budget-ledger::-webkit-scrollbar-track, .chat-messages::-webkit-scrollbar-track { background: transparent; }
 .budget-ledger::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 .budget-ledger::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:hover { background: var(--light-slate); }
+
+.brand-logo { max-height: 48px; width: auto; object-fit: contain; }
+
