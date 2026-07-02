@@ -45,6 +45,15 @@
         </div>
         <button type="submit" class="btn-primary">Begin Planning</button>
       </form>
+      <div class="admin-auth">
+        <div class="admin-auth-divider"></div>
+        <div class="admin-auth-row">
+          <input type="password" id="admin-pw" placeholder="Admin code" class="admin-pw-input">
+          <button type="button" id="admin-auth-btn" class="admin-auth-btn">Authenticate</button>
+          <span id="admin-auth-status" class="admin-auth-status"></span>
+        </div>
+        <div id="admin-auth-error" class="admin-error hidden"></div>
+      </div>
     </div>
   </div>
 
@@ -358,24 +367,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════ ADMIN LOGIN ═══════════════════ -->
-  <div class="admin-login-overlay" id="admin-login-overlay">
-    <div class="onboarding-modal">
-      <div class="brand-mark">
-        <span class="dot"></span>
-        <span>codeshakers</span>
-      </div>
-      <h2>Access Required</h2>
-      <p class="subtitle">Enter the access code to continue.</p>
-      <form id="admin-login-form">
-        <div class="field">
-          <input type="password" id="admin-password" placeholder="Enter access code" required autofocus>
-        </div>
-        <div id="admin-error" class="admin-error hidden"></div>
-        <button type="submit" class="btn-primary">Continue</button>
-      </form>
-    </div>
-  </div>
+
 
   <script src="script.js"></script>
 </body>

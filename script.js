@@ -122,10 +122,10 @@
   const logoutCancel = $('#logout-cancel');
   const logoutConfirm = $('#logout-confirm');
 
-  const adminOverlay = $('#admin-login-overlay');
-  const adminForm = $('#admin-login-form');
-  const adminPassword = $('#admin-password');
-  const adminError = $('#admin-error');
+  const adminPwInput = $('#admin-pw');
+  const adminAuthBtn = $('#admin-auth-btn');
+  const adminAuthStatus = $('#admin-auth-status');
+  const adminAuthError = $('#admin-auth-error');
 
   // ─── Client ID ────────────────────────────────────
   function getOrCreateClientId () {
@@ -637,7 +637,7 @@
     return div.innerHTML;
   }
 
-  // ─── Admin Login ────────────────────────────────
+  // ─── Admin Auth ─────────────────────────────────
   function isAdmin () {
     return localStorage.getItem('codeshakers_admin') === 'true';
   }
@@ -647,29 +647,30 @@
     else localStorage.removeItem('codeshakers_admin');
   }
 
-  function showAdminLogin () {
-    hideAdminError();
-    adminPassword.value = '';
-    adminOverlay.classList.add('show');
-    setTimeout(function () { adminPassword.focus(); }, 100);
-  }
-
-  function hideAdminError () {
-    adminError.classList.add('hidden');
-    adminError.textContent = '';
-  }
-
-  function handleAdminLogin (e) {
-    e.preventDefault();
-    hideAdminError();
-    var password = adminPassword.value;
-    if (password === 'Admin@101') {
-      setAdmin(true);
-      adminOverlay.classList.remove('show');
-      resumeBoot();
+  function updateAdminStatus () {
+    if (isAdmin()) {
+      adminAuthStatus.textContent = '\u2713';
+      adminAuthStatus.style.color = 'var(--success)';
+      adminPwInput.style.display = 'none';
+      adminAuthBtn.style.display = 'none';
     } else {
-      adminError.textContent = 'Invalid access code.';
-      adminError.classList.remove('hidden');
+      adminAuthStatus.textContent = '';
+      adminPwInput.style.display = '';
+      adminAuthBtn.style.display = '';
+    }
+  }
+
+  function handleAdminAuth () {
+    var pw = adminPwInput.value;
+    adminAuthError.classList.add('hidden');
+    if (pw === 'Admin@101') {
+      setAdmin(true);
+      updateAdminStatus();
+    } else {
+      adminAuthError.textContent = 'Invalid code.';
+      adminAuthError.classList.remove('hidden');
+      adminPwInput.value = '';
+      adminPwInput.focus();
     }
   }
 
@@ -696,8 +697,9 @@
   }
 
   // ─── Bootstrap ─────────────────────────────────────
-  async function resumeBoot () {
+  async function boot () {
     clientId = getOrCreateClientId();
+    updateAdminStatus();
 
     if (isAdmin()) {
       var remote = await adminApiGet();
@@ -715,14 +717,6 @@
       var today = new Date().toISOString().split('T')[0];
       document.getElementById('wedding-date').setAttribute('min', today);
       onboardingOverlay.classList.remove('hidden');
-    }
-  }
-
-  function boot () {
-    if (isAdmin()) {
-      resumeBoot();
-    } else {
-      showAdminLogin();
     }
   }
 
@@ -753,7 +747,8 @@
   });
   logoutConfirm.addEventListener('click', handleLogout);
 
-  adminForm.addEventListener('submit', handleAdminLogin);
+  adminAuthBtn.addEventListener('click', handleAdminAuth);
+  adminPwInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') handleAdminAuth(); });
 
   boot();
 
