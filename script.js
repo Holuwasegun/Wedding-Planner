@@ -122,11 +122,8 @@
   const logoutCancel = $('#logout-cancel');
   const logoutConfirm = $('#logout-confirm');
 
-  const adminLink = $('#admin-link');
   const adminOverlay = $('#admin-login-overlay');
-  const adminClose = $('#admin-login-close');
   const adminForm = $('#admin-login-form');
-  const adminEmail = $('#admin-email');
   const adminPassword = $('#admin-password');
   const adminError = $('#admin-error');
 
@@ -648,19 +645,13 @@
   function setAdmin (val) {
     if (val) localStorage.setItem('codeshakers_admin', 'true');
     else localStorage.removeItem('codeshakers_admin');
-    adminLink.classList.toggle('logged-in', !!val);
   }
 
-  function openAdmin () {
+  function showAdminLogin () {
     hideAdminError();
-    adminEmail.value = '';
     adminPassword.value = '';
     adminOverlay.classList.add('show');
-    setTimeout(function () { adminEmail.focus(); }, 100);
-  }
-
-  function closeAdmin () {
-    adminOverlay.classList.remove('show');
+    setTimeout(function () { adminPassword.focus(); }, 100);
   }
 
   function hideAdminError () {
@@ -671,13 +662,13 @@
   function handleAdminLogin (e) {
     e.preventDefault();
     hideAdminError();
-    var email = adminEmail.value.trim();
     var password = adminPassword.value;
-    if (email === 'Admin@101' && password === 'Admin@101') {
+    if (password === 'Admin@101') {
       setAdmin(true);
-      closeAdmin();
+      adminOverlay.classList.remove('show');
+      resumeBoot();
     } else {
-      adminError.textContent = 'Invalid email or password.';
+      adminError.textContent = 'Invalid access code.';
       adminError.classList.remove('hidden');
     }
   }
@@ -705,8 +696,7 @@
   }
 
   // ─── Bootstrap ─────────────────────────────────────
-  async function boot () {
-    if (isAdmin()) adminLink.classList.add('logged-in');
+  async function resumeBoot () {
     clientId = getOrCreateClientId();
 
     if (isAdmin()) {
@@ -725,6 +715,14 @@
       var today = new Date().toISOString().split('T')[0];
       document.getElementById('wedding-date').setAttribute('min', today);
       onboardingOverlay.classList.remove('hidden');
+    }
+  }
+
+  function boot () {
+    if (isAdmin()) {
+      resumeBoot();
+    } else {
+      showAdminLogin();
     }
   }
 
@@ -755,10 +753,7 @@
   });
   logoutConfirm.addEventListener('click', handleLogout);
 
-  adminLink.addEventListener('click', openAdmin);
-  adminClose.addEventListener('click', closeAdmin);
   adminForm.addEventListener('submit', handleAdminLogin);
-  adminOverlay.addEventListener('click', function (e) { if (e.target === adminOverlay) closeAdmin(); });
 
   boot();
 

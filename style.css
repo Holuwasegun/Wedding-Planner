@@ -947,18 +947,6 @@ a { color: var(--primary); text-decoration: none; }
 }
 
 /* ───────────────── Admin Login ────────────────── */
-.admin-link {
-  position: fixed; top: 0.5rem; right: 0.75rem;
-  z-index: 999;
-  font-size: 0.7rem; color: rgba(0,0,0,0.25);
-  cursor: pointer; user-select: none;
-  transition: color 0.2s;
-  font-family: var(--font-body);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.admin-link:hover { color: var(--primary); }
-.admin-link.logged-in { color: var(--primary); }
 .admin-login-overlay {
   display: none;
   position: fixed; inset: 0; z-index: 3000;
@@ -967,10 +955,8 @@ a { color: var(--primary); text-decoration: none; }
   padding: 1.5rem;
 }
 .admin-login-overlay.show { display: flex; }
-.admin-login-overlay .modal-content {
-  background: var(--white); border-radius: var(--radius);
-  width: 100%; max-width: 400px;
-  padding: 2rem 1.5rem;
+.admin-login-overlay .onboarding-modal {
+  max-width: 380px;
 }
 .admin-error {
   background: #FEE2E2;
