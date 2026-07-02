@@ -1,9 +1,6 @@
 (function () {
   'use strict';
 
-  const SUPABASE_URL = 'https://scqvzdyljyfiohbvlbch.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_IUVrnRuWnWPY92T2hj41Vg_Y8N-t1PQ';
-
   const CHECKLIST_TASKS = [
     {
       title: '6+ Months Out',
@@ -57,8 +54,6 @@
     "Start with your vision, then build around it. Every great wedding tells a story — yours should too. What story do you want to tell?"
   ];
 
-  const AUTH_URL = SUPABASE_URL + '/auth/v1';
-
   let state = {
     onboarding: null,
     checklist: [],
@@ -72,21 +67,6 @@
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
-
-  const authOverlay = $('#auth-overlay');
-  const authLogin = $('#auth-login');
-  const authSignup = $('#auth-signup');
-  const authLoader = $('#auth-loader');
-  const loginForm = $('#login-form');
-  const signupForm = $('#signup-form');
-  const loginEmail = $('#login-email');
-  const loginPassword = $('#login-password');
-  const signupEmail = $('#signup-email');
-  const signupPassword = $('#signup-password');
-  const loginError = $('#login-error');
-  const signupError = $('#signup-error');
-  const showSignup = $('#show-signup');
-  const showLogin = $('#show-login');
 
   const onboardingOverlay = $('#onboarding-overlay');
   const onboardingForm = $('#onboarding-form');
@@ -125,12 +105,6 @@
   const settingsDate = $('#settings-date');
   const settingsBudget = $('#settings-budget');
 
-  const btnLogout = $('#btn-logout');
-  const logoutOverlay = $('#logout-overlay');
-  const logoutClose = $('#logout-close');
-  const logoutCancel = $('#logout-cancel');
-  const logoutConfirm = $('#logout-confirm');
-
   const cardDays = $('#card-days');
   const cardTasks = $('#card-tasks');
   const cardRemaining = $('#card-remaining');
@@ -142,185 +116,6 @@
   const mobileMenuBtn = $('#mobile-menu-btn');
   const sidebarLinks = $$('.sidebar-link');
 
-  // ─── Auth (Supabase REST API, no CDN) ─────────────
-  function getStoredSession () {
-    try { var r = localStorage.getItem('codeshakers_auth'); return r ? JSON.parse(r) : null; } catch (e) { return null; }
-  }
-
-  function clearStoredSession () {
-    localStorage.removeItem('codeshakers_auth');
-  }
-
-  async function refreshToken () {
-    var session = getStoredSession();
-    if (!session || !session.refresh_token) return null;
-    try {
-      var res = await fetch(AUTH_URL + '/token?grant_type=refresh_token', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: session.refresh_token })
-      });
-      if (!res.ok) { clearStoredSession(); return null; }
-      var data = await res.json();
-      if (data.access_token) {
-        localStorage.setItem('codeshakers_auth', JSON.stringify({
-          access_token: data.access_token,
-          refresh_token: data.refresh_token || session.refresh_token,
-          expires_at: Date.now() + ((data.expires_in || 3600) * 1000),
-          user_id: session.user_id
-        }));
-        return data;
-      }
-      clearStoredSession(); return null;
-    } catch (e) { return null; }
-  }
-
-  async function getAuthToken () {
-    var session = getStoredSession();
-    if (!session) return null;
-    if (session.expires_at < Date.now() + 60000) {
-      var refreshed = await refreshToken();
-      if (!refreshed) return null;
-      session = getStoredSession();
-    }
-    return session ? session.access_token : null;
-  }
-
-  async function authSignIn (email, password) {
-    var res = await fetch(AUTH_URL + '/token?grant_type=password', {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password })
-    });
-    var data = await res.json();
-    if (data.access_token) {
-      localStorage.setItem('codeshakers_auth', JSON.stringify({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_at: Date.now() + ((data.expires_in || 3600) * 1000),
-        user_id: data.user ? data.user.id : null
-      }));
-      clientId = data.user ? data.user.id : null;
-      localStorage.setItem('codeshakers_client_id', clientId);
-    }
-    return data;
-  }
-
-  async function authSignUp (email, password) {
-    var res = await fetch(AUTH_URL + '/signup', {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password })
-    });
-    return res.json();
-  }
-
-  async function authSignOut () {
-    var session = getStoredSession();
-    if (session && session.access_token) {
-      try {
-        await fetch(AUTH_URL + '/logout', {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + session.access_token }
-        });
-      } catch (e) {}
-    }
-    clearStoredSession();
-    clientId = '';
-    localStorage.removeItem('codeshakers_client_id');
-    showAuthView('login');
-    loginEmail.value = '';
-    loginPassword.value = '';
-    authOverlay.classList.remove('hidden');
-    dashboard.classList.add('hidden');
-    onboardingOverlay.classList.add('hidden');
-    if (countdownInterval) clearInterval(countdownInterval);
-  }
-
-  function showAuthView (view) {
-    authLogin.classList.toggle('hidden', view !== 'login');
-    authSignup.classList.toggle('hidden', view !== 'signup');
-    authLoader.classList.add('hidden');
-  }
-
-  function showAuthError (el, msg) {
-    el.textContent = msg;
-    el.classList.remove('hidden');
-  }
-
-  function hideAuthError (el) {
-    el.classList.add('hidden');
-    el.textContent = '';
-  }
-
-  function authLoading (loading) {
-    authLoader.classList.toggle('hidden', !loading);
-    authLogin.classList.toggle('hidden', loading);
-    authSignup.classList.toggle('hidden', loading);
-  }
-
-  async function handleLogin (e) {
-    e.preventDefault();
-    hideAuthError(loginError);
-    var email = loginEmail.value.trim();
-    var password = loginPassword.value;
-    if (!email || !password) return;
-    authLoading(true);
-    var data = await authSignIn(email, password);
-    authLoading(false);
-    if (data.error) {
-      var msg = data.error_description || data.error || 'Invalid email or password.';
-      showAuthError(loginError, msg);
-    }
-  }
-
-  async function handleSignup (e) {
-    e.preventDefault();
-    hideAuthError(signupError);
-    var email = signupEmail.value.trim();
-    var password = signupPassword.value;
-    if (!email || !password) return;
-    if (password.length < 6) {
-      showAuthError(signupError, 'Password must be at least 6 characters.');
-      return;
-    }
-    authLoading(true);
-    var data = await authSignUp(email, password);
-    authLoading(false);
-    if (data.error) {
-      showAuthView('signup');
-      showAuthError(signupError, data.error_description || data.error);
-    } else if (data.id || data.user) {
-      showAuthView('login');
-      showAuthError(loginError, 'A verification link has been sent to ' + email + '. Click the link to verify your account, then sign in.');
-      signupEmail.value = '';
-      signupPassword.value = '';
-    }
-  }
-
-  // Called after successful login (from boot or handleLogin)
-  async function onSignedIn () {
-    var session = getStoredSession();
-    if (!session || !session.user_id) return;
-    clientId = session.user_id;
-    localStorage.setItem('codeshakers_client_id', clientId);
-    authOverlay.classList.add('hidden');
-    var loaded = loadState();
-    if (loaded && state.onboarding) {
-      initDashboard();
-      loadStateFromAPI();
-    } else {
-      var apiLoaded = await loadStateFromAPI();
-      if (apiLoaded && state.onboarding) {
-        initDashboard();
-      } else {
-        var today = new Date().toISOString().split('T')[0];
-        document.getElementById('wedding-date').setAttribute('min', today);
-        onboardingOverlay.classList.remove('hidden');
-      }
-    }
-  }
-
   // ─── Client ID ────────────────────────────────────
   function getOrCreateClientId () {
     let id = localStorage.getItem('codeshakers_client_id');
@@ -331,42 +126,11 @@
     return id;
   }
 
-  // ─── API ──────────────────────────────────────────
-  const API_BASE = '/api';
-
-  async function apiGet () {
-    const token = await getAuthToken();
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    try {
-      const res = await fetch(`${API_BASE}/data?client_id=${clientId}`, { headers });
-      const json = await res.json();
-      return json.data;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  async function apiPut (weddingData) {
-    const token = await getAuthToken();
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    try {
-      await fetch(`${API_BASE}/data?client_id=${clientId}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({ wedding_data: weddingData })
-      });
-    } catch (e) {
-    }
-  }
-
   // ─── localStorage ──────────────────────────────────
   function saveState () {
     try {
       localStorage.setItem('codeshakers_state', JSON.stringify(state));
     } catch (e) { }
-    apiPut(state);
   }
 
   function loadState () {
@@ -396,16 +160,6 @@
       }));
       saveState();
     }
-  }
-
-  async function loadStateFromAPI () {
-    const remote = await apiGet();
-    if (remote) {
-      applyParsedState(remote);
-      saveState();
-      return true;
-    }
-    return false;
   }
 
   // ─── Onboarding ────────────────────────────────────
@@ -804,20 +558,6 @@
     initDashboard();
   }
 
-  // ─── Logout ────────────────────────────────────────
-  function openLogout () {
-    logoutOverlay.classList.add('show');
-  }
-
-  function closeLogout () {
-    logoutOverlay.classList.remove('show');
-  }
-
-  async function handleLogout () {
-    closeLogout();
-    await signOut();
-  }
-
   // ─── Summary Cards ───────────────────────────────
   function updateSummaryCards () {
     if (!state.onboarding) return;
@@ -861,47 +601,19 @@
   }
 
   // ─── Bootstrap ─────────────────────────────────────
-  async function boot () {
-    var session = getStoredSession();
-    if (session && session.access_token) {
-      if (session.expires_at < Date.now() + 60000) {
-        var refreshed = await refreshToken();
-        if (!refreshed) { showAuthView('login'); authOverlay.classList.remove('hidden'); return; }
-        session = getStoredSession();
-      }
-      if (session && session.user_id) {
-        clientId = session.user_id;
-        localStorage.setItem('codeshakers_client_id', clientId);
-        var loaded = loadState();
-        if (loaded && state.onboarding) {
-          authOverlay.classList.add('hidden');
-          initDashboard();
-          loadStateFromAPI();
-        } else {
-          var apiLoaded = await loadStateFromAPI();
-          authOverlay.classList.add('hidden');
-          if (apiLoaded && state.onboarding) {
-            initDashboard();
-          } else {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById('wedding-date').setAttribute('min', today);
-            onboardingOverlay.classList.remove('hidden');
-          }
-        }
-        return;
-      }
-    }
+  function boot () {
     clientId = getOrCreateClientId();
-    showAuthView('login');
-    authOverlay.classList.remove('hidden');
+    var loaded = loadState();
+    if (loaded && state.onboarding) {
+      initDashboard();
+    } else {
+      var today = new Date().toISOString().split('T')[0];
+      document.getElementById('wedding-date').setAttribute('min', today);
+      onboardingOverlay.classList.remove('hidden');
+    }
   }
 
   // ─── Event Bindings ────────────────────────────────
-  loginForm.addEventListener('submit', handleLogin);
-  signupForm.addEventListener('submit', handleSignup);
-  showSignup.addEventListener('click', (e) => { e.preventDefault(); showAuthView('signup'); });
-  showLogin.addEventListener('click', (e) => { e.preventDefault(); showAuthView('login'); });
-
   onboardingForm.addEventListener('submit', handleOnboarding);
   budgetForm.addEventListener('submit', handleAddExpense);
   chatToggle.addEventListener('click', () => toggleChat(true));
@@ -919,14 +631,6 @@
     if (e.target === settingsOverlay) closeSettings();
   });
   settingsForm.addEventListener('submit', handleSettingsSave);
-
-  btnLogout.addEventListener('click', openLogout);
-  logoutClose.addEventListener('click', closeLogout);
-  logoutCancel.addEventListener('click', closeLogout);
-  logoutOverlay.addEventListener('click', (e) => {
-    if (e.target === logoutOverlay) closeLogout();
-  });
-  logoutConfirm.addEventListener('click', handleLogout);
 
   boot();
 

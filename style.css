@@ -164,46 +164,6 @@ a { color: var(--primary); text-decoration: none; }
 }
 
 /* ───────────────── Auth ───────────────── */
-#auth-overlay {
-  position: fixed; inset: 0; z-index: 2000;
-  background: var(--obsidian);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1.5rem;
-  animation: fadeIn 0.5s ease;
-}
-.auth-error {
-  background: #FEE2E2;
-  color: var(--danger);
-  font-size: 0.85rem;
-  padding: 0.6rem 1rem;
-  border-radius: var(--radius-sm);
-  margin-bottom: 0.75rem;
-  border: 1px solid #FECACA;
-}
-.auth-toggle-text {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  color: var(--slate);
-}
-.auth-toggle-text a {
-  color: var(--primary);
-  font-weight: 600;
-}
-.auth-toggle-text a:hover {
-  text-decoration: underline;
-}
-.auth-spinner {
-  width: 36px; height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
 /* ───────────────── Dashboard Layout ───────────────── */
 #dashboard {
   display: flex; min-height: 100vh;
@@ -270,12 +230,7 @@ a { color: var(--primary); text-decoration: none; }
 .sidebar-btn {
   font-size: 0.875rem;
 }
-.sidebar-logout {
-  color: rgba(255,255,255,0.7);
-}
-.sidebar-logout:hover {
-  color: var(--white) !important;
-  background: rgba(243, 28, 8, 0.25) !important;
+
 }
 .sidebar-toggle {
   display: none;
