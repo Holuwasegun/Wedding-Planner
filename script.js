@@ -528,6 +528,8 @@
       if (indicator) indicator.remove();
       if (data.reply) {
         appendChatMessage(data.reply, 'bot');
+      } else if (data.error) {
+        appendChatMessage('Wedding AI is unavailable: ' + data.error, 'bot');
       } else {
         appendChatMessage('Wedding AI is taking a moment to reflect. Please try again.', 'bot');
       }

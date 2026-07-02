@@ -8,7 +8,7 @@ A branded digital wedding planning app with Supabase persistence (admin only), G
 - **Dashboard** — Countdown timer, summary cards (days left, tasks done, budget remaining, expenses)
 - **Milestones checklist** — 4 phases with collapsible sections, add/delete/check off tasks
 - **Budget ledger** — Track expenses in NGN, see spent/remaining at a glance
-- **Wedding AI chat** — Real Gemini 2.0 Flash AI consultant with full wedding context
+- **Wedding AI chat** — Real Gemini AI consultant with full wedding context
 - **Settings modal** — Edit wedding details anytime
 - **Admin account** — Click "Admin" below Begin Planning → enter code `Admin@101` → automatically fetches your data from Supabase and goes straight to the dashboard (or shows onboarding if no cloud data exists)
 - **Non-admin users** — No login needed, data stored in localStorage only (per-browser)

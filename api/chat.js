@@ -44,15 +44,18 @@ Keep responses concise, warm, and practical. Give specific recommendations, exam
 
   try {
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }]
+          },
           contents: [
             {
               role: 'user',
-              parts: [{ text: systemPrompt + '\n\nUser message: ' + message }]
+              parts: [{ text: message }]
             }
           ],
           generationConfig: {
@@ -66,15 +69,15 @@ Keep responses concise, warm, and practical. Give specific recommendations, exam
 
     const data = await resp.json();
 
-    if (data.error) {
-      console.error('Gemini API error:', data.error);
-      return res.status(500).json({ error: data.error.message });
+    if (!resp.ok) {
+      console.error('Gemini API error:', resp.status, JSON.stringify(data));
+      return res.status(500).json({ error: data?.error?.message || 'Gemini API error' });
     }
 
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'I apologize, but I am having trouble responding right now. Please try again.';
     return res.status(200).json({ reply });
   } catch (err) {
     console.error('Gemini API call failed:', err);
-    return res.status(500).json({ error: 'Failed to get AI response' });
+    return res.status(500).json({ error: 'Failed to get AI response: ' + err.message });
   }
 };
