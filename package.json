@@ -1,0 +1,11 @@
+{
+  "name": "codeshakers-wedding-planner",
+  "version": "1.0.0",
+  "description": "codeshakers — Digital Wedding Planner",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
