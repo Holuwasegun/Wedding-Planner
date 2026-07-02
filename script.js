@@ -57,7 +57,8 @@
     "Start with your vision, then build around it. Every great wedding tells a story — yours should too. What story do you want to tell?"
   ];
 
-  let supabaseClient = null;
+  const AUTH_URL = SUPABASE_URL + '/auth/v1';
+
   let state = {
     onboarding: null,
     checklist: [],
@@ -141,9 +142,99 @@
   const mobileMenuBtn = $('#mobile-menu-btn');
   const sidebarLinks = $$('.sidebar-link');
 
-  // ─── Supabase Auth ────────────────────────────────
-  function initSupabase () {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // ─── Auth (Supabase REST API, no CDN) ─────────────
+  function getStoredSession () {
+    try { var r = localStorage.getItem('codeshakers_auth'); return r ? JSON.parse(r) : null; } catch (e) { return null; }
+  }
+
+  function clearStoredSession () {
+    localStorage.removeItem('codeshakers_auth');
+  }
+
+  async function refreshToken () {
+    var session = getStoredSession();
+    if (!session || !session.refresh_token) return null;
+    try {
+      var res = await fetch(AUTH_URL + '/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: session.refresh_token })
+      });
+      if (!res.ok) { clearStoredSession(); return null; }
+      var data = await res.json();
+      if (data.access_token) {
+        localStorage.setItem('codeshakers_auth', JSON.stringify({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token || session.refresh_token,
+          expires_at: Date.now() + ((data.expires_in || 3600) * 1000),
+          user_id: session.user_id
+        }));
+        return data;
+      }
+      clearStoredSession(); return null;
+    } catch (e) { return null; }
+  }
+
+  async function getAuthToken () {
+    var session = getStoredSession();
+    if (!session) return null;
+    if (session.expires_at < Date.now() + 60000) {
+      var refreshed = await refreshToken();
+      if (!refreshed) return null;
+      session = getStoredSession();
+    }
+    return session ? session.access_token : null;
+  }
+
+  async function authSignIn (email, password) {
+    var res = await fetch(AUTH_URL + '/token?grant_type=password', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem('codeshakers_auth', JSON.stringify({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: Date.now() + ((data.expires_in || 3600) * 1000),
+        user_id: data.user ? data.user.id : null
+      }));
+      clientId = data.user ? data.user.id : null;
+      localStorage.setItem('codeshakers_client_id', clientId);
+    }
+    return data;
+  }
+
+  async function authSignUp (email, password) {
+    var res = await fetch(AUTH_URL + '/signup', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    return res.json();
+  }
+
+  async function authSignOut () {
+    var session = getStoredSession();
+    if (session && session.access_token) {
+      try {
+        await fetch(AUTH_URL + '/logout', {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + session.access_token }
+        });
+      } catch (e) {}
+    }
+    clearStoredSession();
+    clientId = '';
+    localStorage.removeItem('codeshakers_client_id');
+    showAuthView('login');
+    loginEmail.value = '';
+    loginPassword.value = '';
+    authOverlay.classList.remove('hidden');
+    dashboard.classList.add('hidden');
+    onboardingOverlay.classList.add('hidden');
+    if (countdownInterval) clearInterval(countdownInterval);
   }
 
   function showAuthView (view) {
@@ -168,48 +259,42 @@
     authSignup.classList.toggle('hidden', loading);
   }
 
-  async function getAuthToken () {
-    if (!supabaseClient) return null;
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    return session?.access_token || null;
-  }
-
-  async function getCurrentUserId () {
-    if (!supabaseClient) return null;
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    return session?.user?.id || null;
-  }
-
   async function handleLogin (e) {
     e.preventDefault();
     hideAuthError(loginError);
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
+    var email = loginEmail.value.trim();
+    var password = loginPassword.value;
     if (!email || !password) return;
     authLoading(true);
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    var data = await authSignIn(email, password);
     authLoading(false);
-    if (error) {
-      showAuthError(loginError, error.message);
+    if (data.error) {
+      var msg = data.error_description || data.error || 'Invalid email or password.';
+      showAuthError(loginError, msg);
     }
   }
 
   async function handleSignup (e) {
     e.preventDefault();
     hideAuthError(signupError);
-    const email = signupEmail.value.trim();
-    const password = signupPassword.value;
+    var email = signupEmail.value.trim();
+    var password = signupPassword.value;
     if (!email || !password) return;
     if (password.length < 6) {
       showAuthError(signupError, 'Password must be at least 6 characters.');
       return;
     }
     authLoading(true);
-    const { error } = await supabaseClient.auth.signUp({ email, password });
+    var data = await authSignUp(email, password);
     authLoading(false);
-    if (error) {
-      showAuthError(signupError, error.message);
-    } else {
+    if (data.error) {
+      showAuthError(signupError, data.error_description || data.error);
+    } else if (data.id) {
+      showAuthView('login');
+      showAuthError(loginError, 'Account created! Check your email to confirm, then sign in.');
+      signupEmail.value = '';
+      signupPassword.value = '';
+    } else if (data.user) {
       showAuthView('login');
       showAuthError(loginError, 'Account created! Check your email to confirm, then sign in.');
       signupEmail.value = '';
@@ -217,33 +302,27 @@
     }
   }
 
-  async function signOut () {
-    if (supabaseClient) {
-      await supabaseClient.auth.signOut();
-    }
-  }
-
-  function onAuthStateChange () {
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (session?.user) {
-          clientId = session.user.id;
-          localStorage.setItem('codeshakers_client_id', clientId);
-          authOverlay.classList.add('hidden');
-          await bootstrapApp();
-        }
-      } else if (event === 'SIGNED_OUT') {
-        clientId = '';
-        localStorage.removeItem('codeshakers_client_id');
-        showAuthView('login');
-        loginEmail.value = '';
-        loginPassword.value = '';
-        authOverlay.classList.remove('hidden');
-        dashboard.classList.add('hidden');
-        onboardingOverlay.classList.add('hidden');
-        if (countdownInterval) clearInterval(countdownInterval);
+  // Called after successful login (from boot or handleLogin)
+  async function onSignedIn () {
+    var session = getStoredSession();
+    if (!session || !session.user_id) return;
+    clientId = session.user_id;
+    localStorage.setItem('codeshakers_client_id', clientId);
+    authOverlay.classList.add('hidden');
+    var loaded = loadState();
+    if (loaded && state.onboarding) {
+      initDashboard();
+      loadStateFromAPI();
+    } else {
+      var apiLoaded = await loadStateFromAPI();
+      if (apiLoaded && state.onboarding) {
+        initDashboard();
+      } else {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('wedding-date').setAttribute('min', today);
+        onboardingOverlay.classList.remove('hidden');
       }
-    });
+    }
   }
 
   // ─── Client ID ────────────────────────────────────
@@ -786,53 +865,39 @@
   }
 
   // ─── Bootstrap ─────────────────────────────────────
-  async function bootstrapApp () {
-    if (state.onboarding) {
-      initDashboard();
-      loadStateFromAPI();
-    } else {
-      const apiLoaded = await loadStateFromAPI();
-      if (apiLoaded && state.onboarding) {
-        initDashboard();
-      } else {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('wedding-date').setAttribute('min', today);
-        onboardingOverlay.classList.remove('hidden');
-      }
-    }
-  }
-
   async function boot () {
-    initSupabase();
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if (session?.user) {
-      clientId = session.user.id;
-      localStorage.setItem('codeshakers_client_id', clientId);
-      const loaded = loadState();
-      if (loaded && state.onboarding) {
-        authOverlay.classList.add('hidden');
-        initDashboard();
-        loadStateFromAPI();
-      } else {
-        const apiLoaded = await loadStateFromAPI();
-        authOverlay.classList.add('hidden');
-        if (apiLoaded && state.onboarding) {
-          initDashboard();
-        } else {
-          const today = new Date().toISOString().split('T')[0];
-          document.getElementById('wedding-date').setAttribute('min', today);
-          onboardingOverlay.classList.remove('hidden');
-        }
+    var session = getStoredSession();
+    if (session && session.access_token) {
+      if (session.expires_at < Date.now() + 60000) {
+        var refreshed = await refreshToken();
+        if (!refreshed) { showAuthView('login'); authOverlay.classList.remove('hidden'); return; }
+        session = getStoredSession();
       }
-    } else {
-      clientId = getOrCreateClientId();
-      showAuthView('login');
-      authOverlay.classList.remove('hidden');
+      if (session && session.user_id) {
+        clientId = session.user_id;
+        localStorage.setItem('codeshakers_client_id', clientId);
+        var loaded = loadState();
+        if (loaded && state.onboarding) {
+          authOverlay.classList.add('hidden');
+          initDashboard();
+          loadStateFromAPI();
+        } else {
+          var apiLoaded = await loadStateFromAPI();
+          authOverlay.classList.add('hidden');
+          if (apiLoaded && state.onboarding) {
+            initDashboard();
+          } else {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('wedding-date').setAttribute('min', today);
+            onboardingOverlay.classList.remove('hidden');
+          }
+        }
+        return;
+      }
     }
-
-    onAuthStateChange();
+    clientId = getOrCreateClientId();
+    showAuthView('login');
+    authOverlay.classList.remove('hidden');
   }
 
   // ─── Event Bindings ────────────────────────────────
