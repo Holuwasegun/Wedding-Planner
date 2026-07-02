@@ -10,9 +10,9 @@ A branded digital wedding planning app with Supabase persistence (admin only), G
 - **Budget ledger** — Track expenses in NGN, see spent/remaining at a glance
 - **ZenAI chat** — Real Gemini 2.0 Flash AI consultant with full wedding context
 - **Settings modal** — Edit wedding details anytime
-- **Admin account** — Click "Admin" below Begin Planning → enter code `Admin@101` → data syncs to Supabase cloud
+- **Admin account** — Click "Admin" below Begin Planning → enter code `Admin@101` → automatically fetches your data from Supabase and goes straight to the dashboard (or shows onboarding if no cloud data exists)
 - **Non-admin users** — No login needed, data stored in localStorage only (per-browser)
-- **Mobile responsive** — Collapsible sidebar, stacked grids, touch-friendly targets
+- **Mobile responsive** — Collapsible sidebar, stacked grids, 44px+ touch targets on all interactive elements, accessible admin trigger button
 - **Start Over** — Clear all data and begin fresh
 
 ## Tech Stack
@@ -103,8 +103,9 @@ Open the app → fill in the onboarding form → start planning. All data stays 
 1. Fill in the onboarding form or load your existing data
 2. Click **"Admin"** below the Begin Planning button
 3. Enter the admin code: `Admin@101`
-4. Once authenticated, a green ✓ appears — your data now syncs to Supabase automatically
-5. Log in on any device and your data will load from the cloud
+4. Once authenticated, the app fetches your data from Supabase and loads the dashboard immediately
+5. A green ✓ appears — your data now syncs to Supabase automatically
+6. Log in on any device and your data will load from the cloud
 
 ## API Endpoints
 
