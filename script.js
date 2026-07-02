@@ -288,15 +288,11 @@
     var data = await authSignUp(email, password);
     authLoading(false);
     if (data.error) {
+      showAuthView('signup');
       showAuthError(signupError, data.error_description || data.error);
-    } else if (data.id) {
+    } else if (data.id || data.user) {
       showAuthView('login');
-      showAuthError(loginError, 'Account created! Check your email to confirm, then sign in.');
-      signupEmail.value = '';
-      signupPassword.value = '';
-    } else if (data.user) {
-      showAuthView('login');
-      showAuthError(loginError, 'Account created! Check your email to confirm, then sign in.');
+      showAuthError(loginError, 'A verification link has been sent to ' + email + '. Click the link to verify your account, then sign in.');
       signupEmail.value = '';
       signupPassword.value = '';
     }
