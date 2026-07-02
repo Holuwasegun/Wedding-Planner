@@ -977,7 +977,7 @@ a { color: var(--primary); text-decoration: none; }
 
 @media (max-width: 480px) {
   .summary-cards { grid-template-columns: 1fr; gap: 0.75rem; padding: 0.75rem; }
-  .summary-card { padding: 1rem 1.25rem; gap: 1rem; flex-direction: row; text-align: left; border: 1px solid var(--border); box-shadow: var(--shadow-soft); border-radius: var(--radius); }
+  .summary-card { padding: 1rem 1.25rem; gap: 1rem; flex-direction: row; text-align: left; border: 1px solid var(--border); box-shadow: var(--shadow-soft); border-radius: 16px; }
   .summary-card:active { transform: scale(0.98); background: var(--neutral-98); transition: transform 0.15s, background 0.15s; }
   .card-icon { width: 44px; height: 44px; border-radius: 10px; }
   .card-icon svg { width: 22px; height: 22px; }
@@ -995,10 +995,10 @@ a { color: var(--primary); text-decoration: none; }
   .onboarding-modal { padding: 1.5rem 1rem; }
   .onboarding-modal h2 { font-size: 1.4rem; }
   .onboarding-modal .brand-mark span { font-size: 1.2rem; }
-  .countdown-block { gap: 0.75rem; background: var(--white); border-radius: 0; border: none; box-shadow: none; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
-  .countdown-unit { min-width: 40px; }
-  .countdown-unit .num { font-size: 1.1rem; }
-  .countdown-unit .label { font-size: 0.55rem; }
+  .countdown-block { gap: 0.5rem; background: var(--white); border-radius: 0; border: none; box-shadow: none; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .countdown-unit { min-width: 36px; }
+  .countdown-unit .num { font-size: 1rem; }
+  .countdown-unit .label { font-size: 0.5rem; }
   .dashboard-header { padding: 1rem 1.25rem; }
   .couple-info h1 { font-size: 1.25rem; }
   .chat-toggle { bottom: 0.75rem; right: 0.75rem; width: 44px; height: 44px; }
