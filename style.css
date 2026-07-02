@@ -156,14 +156,21 @@ a { color: var(--primary); text-decoration: none; }
   display: flex; align-items: center; gap: 0.75rem;
   margin-bottom: 0.5rem;
 }
-.onboarding-modal .brand-mark span {
+.onboarding-modal .brand-mark .brand-logo-mark {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(13, 53, 140, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.onboarding-modal .brand-mark .dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--primary);
+}
+.onboarding-modal .brand-mark .brand-text {
   font-family: var(--font-heading);
   font-size: 1.5rem; font-weight: 700;
   color: var(--charcoal);
-}
-.onboarding-modal .brand-mark .dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--primary);
+  letter-spacing: -0.02em;
 }
 .onboarding-modal h2 {
   font-size: 1.85rem; margin: 0.5rem 0 0.25rem;
@@ -231,19 +238,25 @@ a { color: var(--primary); text-decoration: none; }
   overflow-y: auto;
 }
 .sidebar-brand {
-  display: flex; align-items: center; gap: 0.6rem;
+  display: flex; align-items: center; gap: 0.75rem;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-brand .brand-logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .sidebar-brand .dot {
   width: 10px; height: 10px; border-radius: 50%;
   background: var(--white);
-  flex-shrink: 0;
 }
 .sidebar-brand .brand-name {
   font-family: var(--font-heading);
-  font-size: 1.2rem; font-weight: 700;
+  font-size: 1.1rem; font-weight: 600;
   color: var(--white);
+  letter-spacing: 0.02em;
 }
 .sidebar-nav {
   flex: 1; padding: 0.75rem 0;
@@ -334,6 +347,12 @@ a { color: var(--primary); text-decoration: none; }
   border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 200;
 }
+.mobile-top-bar .brand-logo-mark {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: rgba(13, 53, 140, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
 .mobile-top-bar .dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--primary);
@@ -344,8 +363,9 @@ a { color: var(--primary); text-decoration: none; }
 }
 .mobile-top-bar .brand-text {
   font-family: var(--font-heading);
-  font-size: 1.1rem; font-weight: 700;
+  font-size: 1rem; font-weight: 600;
   color: var(--charcoal);
+  letter-spacing: 0.02em;
 }
 .mobile-menu-btn {
   background: none; border: none;
@@ -994,7 +1014,7 @@ a { color: var(--primary); text-decoration: none; }
   .modal-content { padding: 1.5rem; }
   .onboarding-modal { padding: 1.5rem 1rem; }
   .onboarding-modal h2 { font-size: 1.4rem; }
-  .onboarding-modal .brand-mark span { font-size: 1.2rem; }
+  .onboarding-modal .brand-mark .brand-text { font-size: 1.2rem; }
   .countdown-block { gap: 0.5rem; background: var(--white); border-radius: 0; border: none; box-shadow: none; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
   .countdown-unit { min-width: 36px; }
   .countdown-unit .num { font-size: 1rem; }
