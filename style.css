@@ -902,7 +902,7 @@ a { color: var(--primary); text-decoration: none; }
   h2 { font-size: 1.35rem; }
   .dashboard-header { padding: 1.25rem 1rem; }
   .couple-info h1 { font-size: 1.5rem; }
-  .countdown-block { width: 100%; justify-content: center; padding: 0.75rem 1rem; }
+  .countdown-block { width: 100%; justify-content: center; padding: 0.75rem 1rem; background: var(--white); border: 1px solid var(--border); box-shadow: var(--shadow-soft); }
   .countdown-unit { min-width: 50px; }
   .countdown-unit .num { font-size: 1.3rem; }
   .countdown-unit .label { font-size: 0.6rem; }
@@ -923,11 +923,15 @@ a { color: var(--primary); text-decoration: none; }
   .mobile-top-bar { padding: 0.6rem 0.75rem; }
   .progress-section { top: 48px; }
   .modal-content { margin: 0.5rem; max-height: 90vh; overflow-y: auto; }
-  .countdown-block { background: rgba(255,255,255,0.06); }
 }
 
 @media (max-width: 480px) {
-  .summary-cards { grid-template-columns: 1fr; gap: 0.5rem; }
+  .summary-cards { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .summary-card { padding: 0.75rem; gap: 0.6rem; flex-direction: column; text-align: center; }
+  .card-icon { width: 32px; height: 32px; border-radius: 8px; }
+  .card-icon svg { width: 16px; height: 16px; }
+  .card-value { font-size: 1rem; }
+  .card-label { font-size: 0.7rem; }
   .phase-header { padding: 0.75rem 1rem; }
   .phase-body { padding: 0.25rem 1rem 1rem; }
   .task-label { font-size: 0.85rem; }
@@ -940,13 +944,12 @@ a { color: var(--primary); text-decoration: none; }
   .onboarding-modal { padding: 1.5rem 1rem; }
   .onboarding-modal h2 { font-size: 1.4rem; }
   .onboarding-modal .brand-mark span { font-size: 1.2rem; }
-  .countdown-block { gap: 0.75rem; }
+  .countdown-block { gap: 0.75rem; background: var(--white); border: 1px solid var(--border); box-shadow: var(--shadow-soft); }
   .countdown-unit { min-width: 40px; }
   .countdown-unit .num { font-size: 1.1rem; }
   .countdown-unit .label { font-size: 0.55rem; }
   .dashboard-header { padding: 1rem 0.75rem; }
   .couple-info h1 { font-size: 1.25rem; }
-  .summary-card { padding: 0.75rem 1rem; gap: 0.75rem; }
   .chat-toggle { bottom: 0.75rem; right: 0.75rem; width: 44px; height: 44px; }
   .chat-toggle svg { width: 20px; height: 20px; }
 }
