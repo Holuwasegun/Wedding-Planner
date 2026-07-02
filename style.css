@@ -162,9 +162,11 @@ a { color: var(--primary); text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.onboarding-modal .brand-mark .dot {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: var(--primary);
+.onboarding-modal .brand-mark .monogram {
+  font-family: var(--font-heading);
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
 }
 .onboarding-modal .brand-mark .brand-text {
   font-family: var(--font-heading);
@@ -248,9 +250,11 @@ a { color: var(--primary); text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.sidebar-brand .dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--white);
+.sidebar-brand .monogram {
+  font-family: var(--font-heading);
+  font-size: 1rem; font-weight: 700;
+  color: var(--white);
+  line-height: 1;
 }
 .sidebar-brand .brand-name {
   font-family: var(--font-heading);
@@ -353,10 +357,11 @@ a { color: var(--primary); text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.mobile-top-bar .dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--primary);
-  flex-shrink: 0;
+.mobile-top-bar .monogram {
+  font-family: var(--font-heading);
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
 }
 .mobile-brand {
   display: flex; align-items: center; gap: 0.6rem;
