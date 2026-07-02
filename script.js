@@ -76,6 +76,7 @@
   const countdownDays = $('#countdown-days');
   const countdownHours = $('#countdown-hours');
   const countdownMinutes = $('#countdown-minutes');
+  const countdownSeconds = $('#countdown-seconds');
   const progressFill = $('#progress-fill');
   const progressPercent = $('#progress-percent');
   const checklistCount = $('#checklist-count');
@@ -274,7 +275,7 @@
   function startCountdown () {
     if (countdownInterval) clearInterval(countdownInterval);
     updateCountdown();
-    countdownInterval = setInterval(updateCountdown, 60000);
+    countdownInterval = setInterval(updateCountdown, 1000);
   }
 
   function updateCountdown () {
@@ -287,9 +288,11 @@
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     countdownDays.textContent = String(days).padStart(2, '0');
     countdownHours.textContent = String(hours).padStart(2, '0');
     countdownMinutes.textContent = String(minutes).padStart(2, '0');
+    countdownSeconds.textContent = String(seconds).padStart(2, '0');
   }
 
   // ─── Checklist ─────────────────────────────────────
@@ -412,7 +415,7 @@
 
   // ─── Budget ────────────────────────────────────────
   function formatCurrency (amount) {
-    return 'NGN' + Math.round(amount).toLocaleString('en-US');
+    return '\u20A6' + Math.round(amount).toLocaleString('en-US');
   }
 
   function renderBudget () {
@@ -425,8 +428,7 @@
 
     const remEl = bRemaining;
     if (remaining < 0) {
-      remEl.textContent = '-NGN' + Math.abs(Math.round(remaining)).toLocaleString('en-US');
-      remEl.className = 'value negative';
+      remEl.textContent = '-\u20A6' + Math.abs(Math.round(remaining)).toLocaleString('en-US');      remEl.className = 'value negative';
     } else {
       remEl.textContent = formatCurrency(remaining);
       remEl.className = 'value';
@@ -623,11 +625,9 @@
     const spent = state.budget.reduce((sum, item) => sum + item.cost, 0);
     const remaining = totalBudget - spent;
     if (remaining < 0) {
-      cardRemaining.textContent = '-NGN' + Math.abs(Math.round(remaining)).toLocaleString('en-US');
-      cardRemaining.style.color = 'var(--danger)';
+      cardRemaining.textContent = '-\u20A6' + Math.abs(Math.round(remaining)).toLocaleString('en-US');      cardRemaining.style.color = 'var(--danger)';
     } else {
-      cardRemaining.textContent = 'NGN' + Math.round(remaining).toLocaleString('en-US');
-      cardRemaining.style.color = '';
+      cardRemaining.textContent = '\u20A6' + Math.round(remaining).toLocaleString('en-US');      cardRemaining.style.color = '';
     }
 
     cardExpenses.textContent = state.budget.length;
