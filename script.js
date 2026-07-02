@@ -219,7 +219,7 @@
     updateSummaryCards();
 
     if (chatMessages.children.length === 0) {
-      appendChatMessage('Welcome to codeshakers. I\'m ZenAI, your wedding planning assistant. Ask me anything — venues, budgeting, decor, timelines, attire, traditions, or whatever you need for your big day.', 'bot');
+      appendChatMessage('Welcome to codeshakers. I\'m Wedding AI, your wedding planning assistant. Ask me anything — venues, budgeting, decor, timelines, attire, traditions, or whatever you need for your big day.', 'bot');
     }
   }
 
@@ -529,7 +529,7 @@
       if (data.reply) {
         appendChatMessage(data.reply, 'bot');
       } else {
-        appendChatMessage('ZenAI is taking a moment to reflect. Please try again.', 'bot');
+        appendChatMessage('Wedding AI is taking a moment to reflect. Please try again.', 'bot');
       }
     } catch (e) {
       const indicator = document.getElementById('typing-indicator');

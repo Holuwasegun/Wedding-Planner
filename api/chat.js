@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   const apiKey = GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'Gemini API key not configured' });
 
-  const systemPrompt = `You are ZenAI, an expert wedding planning consultant integrated into the codeshakers wedding planner app.
+  const systemPrompt = `You are Wedding AI, an expert wedding planning consultant integrated into the codeshakers wedding planner app.
 
 Your role is to give warm, wise, and personalized wedding planning advice on ANY wedding topic, including but not limited to:
 - Venue selection and site tours
