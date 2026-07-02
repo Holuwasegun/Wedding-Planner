@@ -7,13 +7,21 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  const { client_id } = req.query;
+  let client_id = req.query.client_id;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (!error && user) {
+      client_id = user.id;
+    }
+  }
 
   if (!client_id) {
     return res.status(400).json({ error: 'client_id is required' });

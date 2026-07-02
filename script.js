@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  // ─── State ─────────────────────────────────────────
+  const SUPABASE_URL = 'https://scqvzdyljyfiohbvlbch.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_IUVrnRuWnWPY92T2hj41Vg_Y8N-t1PQ';
+
   const CHECKLIST_TASKS = [
     {
       title: '6+ Months Out',
@@ -55,6 +57,7 @@
     "Start with your vision, then build around it. Every great wedding tells a story — yours should too. What story do you want to tell?"
   ];
 
+  let supabaseClient = null;
   let state = {
     onboarding: null,
     checklist: [],
@@ -66,9 +69,23 @@
   let collapsedPhases = new Set();
   let clientId = '';
 
-  // ─── DOM References ────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
+
+  const authOverlay = $('#auth-overlay');
+  const authLogin = $('#auth-login');
+  const authSignup = $('#auth-signup');
+  const authLoader = $('#auth-loader');
+  const loginForm = $('#login-form');
+  const signupForm = $('#signup-form');
+  const loginEmail = $('#login-email');
+  const loginPassword = $('#login-password');
+  const signupEmail = $('#signup-email');
+  const signupPassword = $('#signup-password');
+  const loginError = $('#login-error');
+  const signupError = $('#signup-error');
+  const showSignup = $('#show-signup');
+  const showLogin = $('#show-login');
 
   const onboardingOverlay = $('#onboarding-overlay');
   const onboardingForm = $('#onboarding-form');
@@ -124,7 +141,112 @@
   const mobileMenuBtn = $('#mobile-menu-btn');
   const sidebarLinks = $$('.sidebar-link');
 
-  // ─── Client ID (for API) ─────────────────────────
+  // ─── Supabase Auth ────────────────────────────────
+  function initSupabase () {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  function showAuthView (view) {
+    authLogin.classList.toggle('hidden', view !== 'login');
+    authSignup.classList.toggle('hidden', view !== 'signup');
+    authLoader.classList.add('hidden');
+  }
+
+  function showAuthError (el, msg) {
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideAuthError (el) {
+    el.classList.add('hidden');
+    el.textContent = '';
+  }
+
+  function authLoading (loading) {
+    authLoader.classList.toggle('hidden', !loading);
+    authLogin.classList.toggle('hidden', loading);
+    authSignup.classList.toggle('hidden', loading);
+  }
+
+  async function getAuthToken () {
+    if (!supabaseClient) return null;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    return session?.access_token || null;
+  }
+
+  async function getCurrentUserId () {
+    if (!supabaseClient) return null;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    return session?.user?.id || null;
+  }
+
+  async function handleLogin (e) {
+    e.preventDefault();
+    hideAuthError(loginError);
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
+    if (!email || !password) return;
+    authLoading(true);
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    authLoading(false);
+    if (error) {
+      showAuthError(loginError, error.message);
+    }
+  }
+
+  async function handleSignup (e) {
+    e.preventDefault();
+    hideAuthError(signupError);
+    const email = signupEmail.value.trim();
+    const password = signupPassword.value;
+    if (!email || !password) return;
+    if (password.length < 6) {
+      showAuthError(signupError, 'Password must be at least 6 characters.');
+      return;
+    }
+    authLoading(true);
+    const { error } = await supabaseClient.auth.signUp({ email, password });
+    authLoading(false);
+    if (error) {
+      showAuthError(signupError, error.message);
+    } else {
+      showAuthView('login');
+      showAuthError(loginError, 'Account created! Check your email to confirm, then sign in.');
+      signupEmail.value = '';
+      signupPassword.value = '';
+    }
+  }
+
+  async function signOut () {
+    if (supabaseClient) {
+      await supabaseClient.auth.signOut();
+    }
+  }
+
+  function onAuthStateChange () {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          clientId = session.user.id;
+          localStorage.setItem('codeshakers_client_id', clientId);
+          authOverlay.classList.add('hidden');
+          await bootstrapApp();
+        }
+      } else if (event === 'SIGNED_OUT') {
+        clientId = '';
+        localStorage.removeItem('codeshakers_client_id');
+        showAuthView('login');
+        loginEmail.value = '';
+        loginPassword.value = '';
+        authOverlay.classList.remove('hidden');
+        dashboard.classList.add('hidden');
+        onboardingOverlay.classList.add('hidden');
+        if (countdownInterval) clearInterval(countdownInterval);
+      }
+    });
+  }
+
+  // ─── Client ID ────────────────────────────────────
   function getOrCreateClientId () {
     let id = localStorage.getItem('codeshakers_client_id');
     if (!id) {
@@ -138,8 +260,11 @@
   const API_BASE = '/api';
 
   async function apiGet () {
+    const token = await getAuthToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
     try {
-      const res = await fetch(`${API_BASE}/data?client_id=${clientId}`);
+      const res = await fetch(`${API_BASE}/data?client_id=${clientId}`, { headers });
       const json = await res.json();
       return json.data;
     } catch (e) {
@@ -148,10 +273,13 @@
   }
 
   async function apiPut (weddingData) {
+    const token = await getAuthToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
     try {
       await fetch(`${API_BASE}/data?client_id=${clientId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ wedding_data: weddingData })
       });
     } catch (e) {
@@ -601,7 +729,7 @@
     initDashboard();
   }
 
-  // ─── Logout Modal ────────────────────────────────
+  // ─── Logout ────────────────────────────────────────
   function openLogout () {
     logoutOverlay.classList.add('show');
   }
@@ -610,13 +738,9 @@
     logoutOverlay.classList.remove('show');
   }
 
-  function handleLogout () {
+  async function handleLogout () {
     closeLogout();
-    dashboard.classList.add('hidden');
-    onboardingOverlay.classList.remove('hidden');
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('wedding-date').setAttribute('min', today);
-    if (countdownInterval) clearInterval(countdownInterval);
+    await signOut();
   }
 
   // ─── Summary Cards ───────────────────────────────
@@ -661,7 +785,62 @@
     return div.innerHTML;
   }
 
+  // ─── Bootstrap ─────────────────────────────────────
+  async function bootstrapApp () {
+    if (state.onboarding) {
+      initDashboard();
+      loadStateFromAPI();
+    } else {
+      const apiLoaded = await loadStateFromAPI();
+      if (apiLoaded && state.onboarding) {
+        initDashboard();
+      } else {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('wedding-date').setAttribute('min', today);
+        onboardingOverlay.classList.remove('hidden');
+      }
+    }
+  }
+
+  async function boot () {
+    initSupabase();
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session?.user) {
+      clientId = session.user.id;
+      localStorage.setItem('codeshakers_client_id', clientId);
+      const loaded = loadState();
+      if (loaded && state.onboarding) {
+        authOverlay.classList.add('hidden');
+        initDashboard();
+        loadStateFromAPI();
+      } else {
+        const apiLoaded = await loadStateFromAPI();
+        authOverlay.classList.add('hidden');
+        if (apiLoaded && state.onboarding) {
+          initDashboard();
+        } else {
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById('wedding-date').setAttribute('min', today);
+          onboardingOverlay.classList.remove('hidden');
+        }
+      }
+    } else {
+      clientId = getOrCreateClientId();
+      showAuthView('login');
+      authOverlay.classList.remove('hidden');
+    }
+
+    onAuthStateChange();
+  }
+
   // ─── Event Bindings ────────────────────────────────
+  loginForm.addEventListener('submit', handleLogin);
+  signupForm.addEventListener('submit', handleSignup);
+  showSignup.addEventListener('click', (e) => { e.preventDefault(); showAuthView('signup'); });
+  showLogin.addEventListener('click', (e) => { e.preventDefault(); showAuthView('login'); });
+
   onboardingForm.addEventListener('submit', handleOnboarding);
   budgetForm.addEventListener('submit', handleAddExpense);
   chatToggle.addEventListener('click', () => toggleChat(true));
@@ -688,24 +867,6 @@
   });
   logoutConfirm.addEventListener('click', handleLogout);
 
-  // ─── Bootstrap ─────────────────────────────────────
-  clientId = getOrCreateClientId();
-
-  (async function bootstrap () {
-    const loaded = loadState();
-    if (loaded && state.onboarding) {
-      initDashboard();
-      loadStateFromAPI();
-    } else {
-      const apiLoaded = await loadStateFromAPI();
-      if (apiLoaded && state.onboarding) {
-        initDashboard();
-      } else {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('wedding-date').setAttribute('min', today);
-        onboardingOverlay.classList.remove('hidden');
-      }
-    }
-  })();
+  boot();
 
 })();
