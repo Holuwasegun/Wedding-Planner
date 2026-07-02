@@ -122,10 +122,13 @@
   const logoutCancel = $('#logout-cancel');
   const logoutConfirm = $('#logout-confirm');
 
-  const adminPwInput = $('#admin-pw');
-  const adminAuthBtn = $('#admin-auth-btn');
-  const adminAuthStatus = $('#admin-auth-status');
-  const adminAuthError = $('#admin-auth-error');
+  const adminTriggerBtn = $('#admin-trigger-btn');
+  const adminTriggerStatus = $('#admin-trigger-status');
+  const adminModalOverlay = $('#admin-modal-overlay');
+  const adminModalForm = $('#admin-modal-form');
+  const adminModalPw = $('#admin-modal-pw');
+  const adminModalError = $('#admin-modal-error');
+  const adminModalCancel = $('#admin-modal-cancel');
 
   // ─── Client ID ────────────────────────────────────
   function getOrCreateClientId () {
@@ -649,28 +652,38 @@
 
   function updateAdminStatus () {
     if (isAdmin()) {
-      adminAuthStatus.textContent = '\u2713';
-      adminAuthStatus.style.color = 'var(--success)';
-      adminPwInput.style.display = 'none';
-      adminAuthBtn.style.display = 'none';
+      adminTriggerBtn.textContent = 'Admin';
+      adminTriggerStatus.textContent = '\u2713';
+      adminTriggerStatus.style.color = 'var(--success)';
     } else {
-      adminAuthStatus.textContent = '';
-      adminPwInput.style.display = '';
-      adminAuthBtn.style.display = '';
+      adminTriggerBtn.textContent = 'Admin';
+      adminTriggerStatus.textContent = '';
     }
   }
 
-  function handleAdminAuth () {
-    var pw = adminPwInput.value;
-    adminAuthError.classList.add('hidden');
-    if (pw === 'Admin@101') {
+  function openAdminModal () {
+    adminModalPw.value = '';
+    adminModalError.classList.add('hidden');
+    adminModalOverlay.classList.add('show');
+    setTimeout(function () { adminModalPw.focus(); }, 100);
+  }
+
+  function closeAdminModal () {
+    adminModalOverlay.classList.remove('show');
+  }
+
+  function handleAdminModalSubmit (e) {
+    e.preventDefault();
+    adminModalError.classList.add('hidden');
+    if (adminModalPw.value === 'Admin@101') {
       setAdmin(true);
+      closeAdminModal();
       updateAdminStatus();
     } else {
-      adminAuthError.textContent = 'Invalid code.';
-      adminAuthError.classList.remove('hidden');
-      adminPwInput.value = '';
-      adminPwInput.focus();
+      adminModalError.textContent = 'Invalid code.';
+      adminModalError.classList.remove('hidden');
+      adminModalPw.value = '';
+      adminModalPw.focus();
     }
   }
 
@@ -747,8 +760,10 @@
   });
   logoutConfirm.addEventListener('click', handleLogout);
 
-  adminAuthBtn.addEventListener('click', handleAdminAuth);
-  adminPwInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') handleAdminAuth(); });
+  adminTriggerBtn.addEventListener('click', openAdminModal);
+  adminModalForm.addEventListener('submit', handleAdminModalSubmit);
+  adminModalCancel.addEventListener('click', closeAdminModal);
+  adminModalOverlay.addEventListener('click', function (e) { if (e.target === adminModalOverlay) closeAdminModal(); });
 
   boot();
 

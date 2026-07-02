@@ -45,14 +45,9 @@
         </div>
         <button type="submit" class="btn-primary">Begin Planning</button>
       </form>
-      <div class="admin-auth">
-        <div class="admin-auth-divider"></div>
-        <div class="admin-auth-row">
-          <input type="password" id="admin-pw" placeholder="Admin code" class="admin-pw-input">
-          <button type="button" id="admin-auth-btn" class="admin-auth-btn">Authenticate</button>
-          <span id="admin-auth-status" class="admin-auth-status"></span>
-        </div>
-        <div id="admin-auth-error" class="admin-error hidden"></div>
+      <div class="admin-trigger">
+        <button type="button" id="admin-trigger-btn" class="admin-trigger-btn">Admin</button>
+        <span id="admin-trigger-status" class="admin-trigger-status"></span>
       </div>
     </div>
   </div>
@@ -367,7 +362,27 @@
     </div>
   </div>
 
-
+  <!-- ═══════════════════ ADMIN LOGIN MODAL ═══════════════════ -->
+  <div class="admin-modal-overlay" id="admin-modal-overlay">
+    <div class="onboarding-modal" style="max-width:340px">
+      <div class="brand-mark">
+        <span class="dot"></span>
+        <span>codeshakers</span>
+      </div>
+      <h2 style="font-size:1.25rem">Admin Access</h2>
+      <p class="subtitle">Enter your admin code to sync data to the cloud.</p>
+      <form id="admin-modal-form">
+        <div class="field">
+          <input type="password" id="admin-modal-pw" placeholder="Admin code" required autofocus>
+        </div>
+        <div id="admin-modal-error" class="admin-error hidden"></div>
+        <div class="modal-actions" style="margin-top:0">
+          <button type="button" class="btn-cancel" id="admin-modal-cancel">Cancel</button>
+          <button type="submit" class="btn-primary">Authenticate</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
